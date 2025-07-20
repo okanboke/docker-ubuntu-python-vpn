@@ -18,6 +18,23 @@ docker_python_vpn_proxy/
 ├── docker-compose.yml
 └── README.md
 
+
+---
+
+## 🛠️ How to Use
+
+### 1. Prepare your VPN files
+- Copy your `.ovpn` config file into `vpn/dockvpn.ovpn`.
+- Copy your VPN credentials into `vpn/auth.txt`  
+  - Format:  
+    ```
+    your-vpn-username
+    your-vpn-password
+    ```
+- Make sure your `.ovpn` file has:
+  ```text
+  auth-user-pass /etc/openvpn/auth.txt
+
 Note: The `vpn/` directory is versioned with a `.gitkeep` file. Do not add your real VPN credentials to Git.
 
 
