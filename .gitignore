@@ -1,0 +1,18 @@
+# Gizli VPN yapılandırmaları
+vpn/*.ovpn
+vpn/auth.txt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS/metafile junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Virtual environments
+venv/
+.env/
