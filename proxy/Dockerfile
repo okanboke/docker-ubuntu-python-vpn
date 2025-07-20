@@ -2,8 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY app.py .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install flask requests
+RUN apt update && apt install -y iproute2 curl && apt clean
 
-CMD ["python", "app.py"]
+COPY . .
+
+RUN chmod +x start.sh
+
+CMD ["sh", "./start.sh"]

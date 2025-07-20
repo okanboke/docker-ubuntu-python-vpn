@@ -1,5 +1,10 @@
 version: '3.8'
 
+networks:
+  vpn-net:
+    name: vpn-net
+    driver: bridge
+
 services:
   openvpn-client:
     image: kylemanna/openvpn
@@ -9,13 +14,31 @@ services:
     devices:
       - /dev/net/tun
     volumes:
-      - C:/Users/OkanBÖKE/Desktop/docker_python_vpn/vpn/dockvpn.ovpn:/etc/openvpn/config.ovpn:ro
-      - C:/Users/OkanBÖKE/Desktop/docker_python_vpn/vpn/auth.txt:/etc/openvpn/auth.txt:ro
+      - C:/Users/OkanBÖKE/Desktop/vpn/docker_python_vpn/vpn/dockvpn.ovpn:/etc/openvpn/config.ovpn:ro
+      - C:/Users/OkanBÖKE/Desktop/vpn/docker_python_vpn/vpn/auth.txt:/etc/openvpn/auth.txt:ro
     command: >
       sh -c "openvpn --config /etc/openvpn/config.ovpn --auth-user-pass /etc/openvpn/auth.txt"
     restart: unless-stopped
     networks:
       - vpn-net
+
+  vpn-nat:
+    image: alpine
+    container_name: vpn-nat
+    depends_on:
+      - openvpn-client
+    entrypoint: >
+      sh -c "
+        echo '[INFO] 20 saniye bekleniyor...';
+        sleep 20;
+        apk add --no-cache iptables;
+        iptables -t nat -A POSTROUTING -s 172.18.0.0/16 -o tun0 -j MASQUERADE;
+        echo '[OK] NAT kuralı eklendi, container uykuya alındı.';
+        tail -f /dev/null;
+      "
+    cap_add:
+      - NET_ADMIN
+    network_mode: "service:openvpn-client"
 
   python-proxy:
     build: ./proxy
@@ -26,7 +49,6 @@ services:
       - vpn-net
     depends_on:
       - openvpn-client
-
-networks:
-  vpn-net:
-    driver: bridge
+    cap_add:
+      - NET_ADMIN  # iptables için gerekli
+    command: ["sh", "-c", "./start.sh"]

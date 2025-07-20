@@ -37,6 +37,30 @@ docker_python_vpn_proxy/
 
 Note: The `vpn/` directory is versioned with a `.gitkeep` file. Do not add your real VPN credentials to Git.
 
+---NEW---
+Stopped using up.sh script: Using the up.sh script inside the OpenVPN container caused issues with adding the NAT rule, so a different method was chosen.
+
+NAT processing moved to a separate container: Created a small container named vpn-nat.
+
+vpn-nat container depends on openvpn-client: Starts only after the openvpn-client container is running.
+
+Added a 20-second startup delay: To ensure the VPN connection and tun0 interface are fully up and ready.
+
+vpn-nat container adds the NAT rule using iptables: It masquerades traffic originating from the 172.18.0.0/16 subnet through the tun0 interface.
+
+vpn-nat container keeps running: Uses tail -f /dev/null to keep the container alive.
+
+Working flow:
+The openvpn-client container starts and establishes the VPN connection.
+
+The vpn-nat container starts after openvpn-client is up.
+
+vpn-nat waits 20 seconds to ensure the tun0 interface is ready.
+
+Then it adds the NAT rule with iptables.
+
+The NAT rule is active, and traffic flows out via the VPN tunnel.
+
 
 ### 🛠️ How to Run
 
@@ -95,6 +119,31 @@ docker-compose up --build
 ```bash
 curl "http://localhost:5000/proxy?url=https://ipinfo.io/ip"
 ```
+
+🔥 Özet: Yapılan Değişiklikler ve Çalışma Sistemi
+Türkçe
+up.sh scripti kullanımı bırakıldı: OpenVPN container içindeki up.sh ile NAT kuralı eklemek sorun çıkarıyordu, bu yüzden farklı bir yöntem tercih edildi.
+
+NAT işlemi ayrı bir container olarak yapıldı: vpn-nat adında küçük bir container oluşturuldu.
+
+vpn-nat container’ı openvpn-client container’ına bağlı çalışıyor: depends_on ile openvpn-client başladıktan sonra başlıyor.
+
+Başlangıçta 20 saniye bekletme eklendi: Bu, VPN bağlantısının tam kurulmasını ve tun0 arayüzünün hazır olmasını sağlamak için.
+
+vpn-nat container’ı iptables ile NAT kuralını ekliyor: 172.18.0.0/16 subnetinden çıkan trafiği tun0 üzerinden MASQUERADE yapıyor.
+
+vpn-nat container’ı sürekli çalışıyor: tail -f /dev/null ile container kapanmıyor.
+
+Çalışma Sistemi:
+openvpn-client container başlar ve VPN bağlantısını kurar.
+
+vpn-nat container, openvpn-client çalışmaya başladıktan sonra başlar.
+
+vpn-nat 20 saniye bekler, böylece tun0 arayüzü tam hazır olur.
+
+Ardından iptables ile NAT kuralını ekler.
+
+NAT kuralı aktif olur ve trafik VPN üzerinden çıkmaya başlar.
 
 ⚠️ Uyarılar
 1 .ovpn ve auth.txt kesinlikle Git'e yüklenmemeli.
