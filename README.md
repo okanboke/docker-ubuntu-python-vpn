@@ -35,8 +35,18 @@ docker-compose up --build
 curl "http://localhost:5000/proxy?url=https://ipinfo.io/ip"
 ```
 
-🇹🇷 Bu Proje Nedir?
+
+## 🇹🇷 Bu Proje Nedir?
 Bu proje, bir Python proxy sunucusunun OpenVPN üzerinden dış dünyaya çıkmasını sağlayan Docker tabanlı bir yapı kurar. Tüm HTTP/HTTPS istekleri, VPN üzerinden yapılır.
+
+🌐 Kullanım Senaryosu
+Windows bilgisayarında bir Java (veya başka bir) uygulaman var.
+
+Bu uygulamanın internete çıkışını VPN üzerinden yapmak istiyorsun.
+
+Projede kurulan proxy, http://localhost:5000/proxy?url=https://... üzerinden çalışır.
+
+Gönderdiğin istek, VPN üzerinden yönlendirilir ve sana HTTP yanıtı döner.
 
 🔧 Nasıl Çalışır?
 openvpn-client container, .ovpn dosyasını kullanarak VPN'e bağlanır.
